@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<script>
+  document.documentElement.classList.add('js');
+  try { var t = localStorage.getItem('halfstep-theme'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+</script>
+<title>How Halfstep was built — Parable build guide</title>
+<meta name="description" content="A build guide for Halfstep: the idea, the Vite + vanilla TypeScript stack, the exploded-assembly scroll technique with a real code excerpt, the details that matter, and shipping to GitHub Pages." />
+<meta name="robots" content="index,follow" />
+<meta name="color-scheme" content="light dark" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2317181a'/%3E%3Cpath d='M7 24 H15 V15 H24 V7' fill='none' stroke='%23c7f04a' stroke-width='3.4'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800;900&family=Manrope:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --ease-cadence: cubic-bezier(.21, .86, .26, .99);
+    --font-d: "Archivo", system-ui, sans-serif;
+    --font-b: "Manrope", system-ui, sans-serif;
+    --font-m: "Space Mono", ui-monospace, monospace;
+    --bg: #ece7dd; --bg-2: #e3ded1; --panel: #f4f0e6;
+    --ink: #17181a; --dim: #46484b; --faint: #77786f;
+    --line: rgba(23, 24, 26, .16); --line-2: rgba(23, 24, 26, .08);
+    --accent: #c7f04a; --accent-ink: #17181a; --acc-text: #4c5c28;
+  }
+  :root[data-theme="dark"] {
+    --bg: #17181a; --bg-2: #1c1e21; --panel: #202226;
+    --ink: #ece7dd; --dim: #b7b3a7; --faint: #82807a;
+    --line: rgba(236, 231, 221, .14); --line-2: rgba(236, 231, 221, .07);
+    --acc-text: #c7f04a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: var(--font-b); font-size: clamp(15px, 1vw + 13px, 17px); line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  .backdrop { position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background: radial-gradient(110% 70% at 85% -10%, color-mix(in oklab, var(--accent) 10%, transparent), transparent 55%); }
+  .doc { position: relative; z-index: 1; width: min(100% - 2.4rem, 820px); margin: 2.2rem auto 5rem; }
+  .doc-back { display: inline-flex; align-items: center; gap: .4rem; color: var(--dim); text-decoration: none; font-size: .86rem; margin-bottom: 1.6rem; }
+  .doc-back:hover { color: var(--ink); }
+  .mono { font-family: var(--font-m); }
+  .eyebrow { color: var(--acc-text); font-size: .72rem; letter-spacing: .2em; text-transform: uppercase; margin: 0 0 .8rem; }
+  h1 { font-family: var(--font-d); font-weight: 900; font-size: clamp(2.1rem, 5vw, 3.2rem); line-height: 1.02; letter-spacing: -.02em; text-transform: uppercase; margin: .2rem 0 .4rem; }
+  h2 { font-family: var(--font-d); font-weight: 800; font-size: clamp(1.35rem, 3vw, 1.8rem); letter-spacing: -.01em; margin: 2.6rem 0 .6rem; }
+  .lede { color: var(--dim); font-size: 1.06rem; margin: 0 0 2rem; }
+  p { color: var(--dim); margin: .7rem 0; }
+  p strong, li strong { color: var(--ink); font-weight: 700; }
+  ul { color: var(--dim); padding-left: 1.1rem; margin: .7rem 0; }
+  li { margin: .4rem 0; }
+  pre { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 1rem 1.1rem; overflow-x: auto; margin: 1rem 0; }
+  code { font-family: var(--font-m); font-size: .8rem; }
+  pre code { color: var(--ink); line-height: 1.6; }
+  .tag-row { display: flex; flex-wrap: wrap; gap: .5rem; margin: 1.2rem 0 0; }
+  .tag-row span { font-family: var(--font-m); font-size: .7rem; padding: .3rem .6rem; border: 1px solid var(--line); border-radius: 999px; color: var(--dim); }
+  .callout { border-left: 3px solid var(--accent); background: color-mix(in oklab, var(--accent) 8%, transparent); padding: .9rem 1.1rem; border-radius: 0 10px 10px 0; margin: 1.4rem 0; }
+  .callout p { margin: 0; color: var(--ink); }
+  a { color: var(--acc-text); }
+  :where(a):focus-visible { outline: 2px solid var(--acc-text); outline-offset: 3px; border-radius: 4px; }
+</style>
+</head>
+<body>
+<div class="backdrop" aria-hidden="true"></div>
+<main class="doc">
+  <a class="doc-back" href="../">← Back to Halfstep</a>
+  <p class="eyebrow mono">[ Parable build guide ]</p>
+  <h1>How Halfstep was built</h1>
+  <p class="lede">One e-bike, taken apart by the scrollbar. The signature is an
+    <strong>exploded-assembly scroll</strong>: an inline-SVG service diagram whose six assemblies fly
+    out into a labelled exploded view as you scroll, then bolt themselves back together — plus a
+    configurator that repaints every diagram on the page live.</p>
+
+  <div class="tag-row">
+    <span>Vite + vanilla TypeScript</span><span>inline SVG only</span><span>Archivo / Manrope / Space Mono</span><span>light + dark</span><span>reduced-motion honest</span>
+  </div>
+
+  <h2>The idea</h2>
+  <p>Every e-bike site shows you a glamour render and a spec table, far apart, hoping you won't
+    compare them. Halfstep's voice is "specs stated plainly" — so the centrepiece states them on the
+    parts themselves. A service diagram is the most honest drawing a bike company can publish: if it
+    comes apart cleanly in the diagram, it comes apart cleanly in your kitchen. The scroll direction
+    maps to disassembly, the labels are printed where the torque actually happens, and reassembly at
+    the end is the quiet warranty pitch.</p>
+
+  <h2>The stack</h2>
+  <p>Vite with vanilla TypeScript — no framework. The page is static HTML with a handful of small
+    modules: <code>explode.ts</code> (the flourish), <code>configurator.ts</code> and
+    <code>rangecalc.ts</code> (which share one battery value through a ten-line
+    <code>state.ts</code>), <code>reveal.ts</code>, <code>theme.ts</code>, <code>form.ts</code>.
+    The bike itself is hand-plotted inline SVG — strokes with round caps for tubes, circles for
+    wheels — so the paint colour is just a CSS variable (<code>--paint</code>) the configurator flips
+    with <code>data-paint</code> on <code>&lt;html&gt;</code>. Type is Archivo at 900 for the
+    engineered shouting, Manrope for body, Space&nbsp;Mono for everything a torque wrench would say.</p>
+
+  <h2>Signature technique — the exploded-assembly scroll</h2>
+  <p>The build section is a tall scroller (~3.4 viewports) with a <code>position: sticky</code>
+    stage pinned inside it. Scroll progress <code>p</code> maps to three phases — fly out, hold the
+    labelled diagram, fly home. Each part is an SVG <code>&lt;g&gt;</code> with an exploded offset
+    and a stagger delay, so the wheels leave first and return last, like an actual teardown:</p>
+  <pre><code>// global explode amount 0 → 1 → 0 across the three phases
+let eRaw: number;
+if (p &lt; 0.4)      eRaw = easeInOutCubic(p / 0.4);        // coming apart
+else if (p &lt; 0.6) eRaw = 1;                              // exploded, labelled
+else              eRaw = 1 - easeInOutCubic((p - 0.6) / 0.4); // reassembling
+
+for (const w of wired) {
+  const local = clamp(eRaw * (1 + STAGGER) - w.def.delay, 0, 1);
+  const e = easeOutCubic(local);
+  w.node.style.transform =
+    `translate(${dx * e}px, ${dy * e}px) rotate(${rot * e}deg)`;
+  // the callout's leader line chases its part
+  w.line.setAttribute('x2', String(ax + dx * e));
+  w.line.setAttribute('y2', String(ay + dy * e));
+}</code></pre>
+  <p>Because CSS pixel translations on SVG children resolve in user units, the same offsets work at
+    every screen size. The callout leader lines are authored in the markup pointing at the
+    <em>assembled</em> anchors, so with JavaScript disabled — or reduced motion on — the diagram is
+    simply a labelled side view. The belt and ground shadows fade out with <code>1 − eRaw</code>,
+    because exploded parts don't cast shadows.</p>
+
+  <h2>Details that matter</h2>
+  <ul>
+    <li><strong>One value, two widgets.</strong> The configurator's battery choice feeds the range
+      calculator through a tiny pub-sub — pick 630&nbsp;Wh up there, the estimate down here updates
+      and says whose pack it's quoting.</li>
+    <li><strong>Honest arithmetic.</strong> The range formula (pack ÷ Wh/km × weight × terrain) is
+      the whole calculator — no fake precision, and the fine print admits what winter costs.</li>
+    <li><strong>Work only when watched.</strong> The render is six transforms and a few attributes —
+      cheap enough to run straight from the scroll event — and an <code>IntersectionObserver</code>
+      disables it entirely while the stage is off-screen.</li>
+    <li><strong>Reduced motion is a design, not a fallback.</strong> The scroller collapses to a
+      static labelled diagram, reveals and counters resolve instantly, and the configurator swaps
+      prices without the count-up.</li>
+    <li><strong>Lime that can read.</strong> Hi-viz <code>#c7f04a</code> fails contrast on bone, so
+      it only ever appears as fills and marks; text gets <code>--acc-text</code> — moss-dark in
+      light mode, the full lime on graphite.</li>
+    <li><strong>Nothing hides without JS.</strong> Reveals and the hero rise are gated behind a
+      <code>.js</code> class set synchronously in <code>&lt;head&gt;</code>.</li>
+  </ul>
+
+  <div class="callout"><p>The reserve form is a demo — it validates and confirms in place but sends
+    nothing. Wire it to your own endpoint (and a real deposit flow) before taking anyone's €100.</p></div>
+
+  <h2>Ship it on GitHub Pages</h2>
+  <p>Vite builds into <code>docs/</code> with <code>base: '/halfstep/'</code>, so Pages can serve
+    the project subpath straight from the branch:</p>
+  <pre><code>npm run build   # tsc --noEmit && vite build → docs/
+gh repo create bswxyz/halfstep --public --source . --push
+gh api --method POST /repos/bswxyz/halfstep/pages \
+  -f 'source[branch]=main' -f 'source[path]=/docs'</code></pre>
+  <p>The <code>public/</code> folder carries <code>.nojekyll</code> and this guide verbatim into the
+    build, so the whole site — diagram, configurator, guide — is one push.</p>
+
+  <a class="doc-back" href="../" style="margin-top:2.6rem">← Back to Halfstep</a>
+</main>
+</body>
+</html>
