@@ -29,10 +29,8 @@ export function initCounters(reducedMotion: boolean): void {
     const dec = parseInt(n.dataset.decimals || '0', 10);
     n.textContent = to.toFixed(dec);
   };
-  if (reducedMotion || !('IntersectionObserver' in window)) {
-    nodes.forEach(finish);
-    return;
-  }
+  // markup ships the final values — no-JS and reduced-motion read them as-is
+  if (reducedMotion || !('IntersectionObserver' in window)) return;
   const io = new IntersectionObserver(
     (entries) => {
       for (const e of entries) {
@@ -56,5 +54,10 @@ export function initCounters(reducedMotion: boolean): void {
     },
     { threshold: 0.6 },
   );
-  nodes.forEach((n) => io.observe(n));
+  nodes.forEach((n) => {
+    // zero out only now that we know the count-up will actually run
+    const dec = parseInt(n.dataset.decimals || '0', 10);
+    n.textContent = (0).toFixed(dec);
+    io.observe(n);
+  });
 }

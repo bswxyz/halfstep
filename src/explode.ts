@@ -25,7 +25,7 @@ interface PartDef {
 const PARTS: PartDef[] = [
   { id: 'fw', dx: 130, dy: 55, rot: 14, delay: 0.0, ax: 716, ay: 310 },
   { id: 'rw', dx: -100, dy: 55, rot: -14, delay: 0.07, ax: 212, ay: 312 },
-  { id: 'saddle', dx: -52, dy: -120, rot: -6, delay: 0.14, ax: 352, ay: 164 },
+  { id: 'saddle', dx: -40, dy: -140, rot: -6, delay: 0.14, ax: 352, ay: 164 },
   { id: 'battery', dx: 90, dy: -150, rot: 8, delay: 0.21, ax: 612, ay: 300 },
   { id: 'motor', dx: 8, dy: 140, rot: -10, delay: 0.28, ax: 486, ay: 432 },
   { id: 'frame', dx: 0, dy: -18, rot: 0, delay: 0.34, ax: 433, ay: 330 },

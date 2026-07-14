@@ -62,9 +62,9 @@
           <a class="btn btn-ghost" href="#build">See it come apart →</a>
         </div>
         <dl class="hero-facts">
-          <div><dt class="mono">Weight</dt><dd><span class="c-num" data-to="14.9" data-decimals="1">0</span> kg</dd></div>
-          <div><dt class="mono">Battery</dt><dd><span class="c-num" data-to="540">0</span> Wh</dd></div>
-          <div><dt class="mono">Assist to</dt><dd><span class="c-num" data-to="25">0</span> km/h</dd></div>
+          <div><dt class="mono">Weight</dt><dd><span class="c-num" data-to="14.9" data-decimals="1">14.9</span> kg</dd></div>
+          <div><dt class="mono">Battery</dt><dd><span class="c-num" data-to="540">540</span> Wh</dd></div>
+          <div><dt class="mono">Assist to</dt><dd><span class="c-num" data-to="25">25</span> km/h</dd></div>
         </dl>
       </div>
 
@@ -194,7 +194,7 @@
 
             <g class="callout" data-for="saddle">
               <line class="c-line" x1="245" y1="54" x2="352" y2="164"/><circle class="c-dot" cx="352" cy="164" r="4"/>
-              <text x="40" y="60"><tspan class="c-name" x="40" dy="0">SADDLE + POST</tspan><tspan x="40" dy="22">STEEL RAILS · 40 MM SUSPENSION</tspan></text>
+              <text x="40" y="60"><tspan class="c-name" x="40" dy="0">SADDLE + POST</tspan><tspan x="40" dy="22">STEEL RAILS · 40 MM TRAVEL</tspan></text>
             </g>
             <g class="callout" data-for="frame">
               <line class="c-line" x1="52" y1="204" x2="433" y2="330"/><circle class="c-dot" cx="433" cy="330" r="4"/>
@@ -298,7 +298,7 @@
           </fieldset>
         </form>
 
-        <aside class="cfg-sum reveal" aria-label="Your configured build" aria-live="polite">
+        <aside class="cfg-sum reveal" aria-label="Your configured build">
           <svg class="mini-bike" viewBox="120 130 720 390" aria-hidden="true" focusable="false">
             <circle cx="218" cy="405" r="93" class="mb-wheel"/><circle cx="708" cy="405" r="93" class="mb-wheel"/>
             <path class="mb-tube" d="M452 415 L668 262" stroke-width="16"/>
@@ -317,7 +317,7 @@
             <div><dt class="mono">Full charge</dt><dd id="sumCharge">4.0 h</dd></div>
             <div><dt class="mono">Delivery</dt><dd>3 weeks, assembled</dd></div>
           </dl>
-          <div class="sum-price"><span class="mono">Price</span><strong id="sumPrice">€2,990</strong></div>
+          <div class="sum-price" aria-live="polite" aria-atomic="true"><span class="mono">Price</span><strong id="sumPrice">€2,990</strong></div>
           <a class="btn btn-primary btn-block" href="#reserve">Reserve this build</a>
           <p class="fine mono">€100 deposit — refundable until your battery is bolted in.</p>
         </aside>
@@ -365,7 +365,7 @@
           <p class="out-eyebrow mono">Estimated range · <span id="rangeBatt">540 Wh pack</span></p>
           <p class="range-big"><span id="rangeKm">54</span><span class="range-unit">km</span></p>
           <div class="range-bar" aria-hidden="true"><i id="rangeFill"></i></div>
-          <p class="range-days">≈ <strong id="rangeDays">3.8</strong> commute days between charges <span class="mono">(14 km/day)</span></p>
+          <p class="range-days">≈ <strong id="rangeDays">3.9</strong> commute days between charges <span class="mono">(14 km/day)</span></p>
           <p class="fine mono">Assumes 20 °C, tyres at 4 bar, no headwind heroics. Deep winter takes ~15 % off.</p>
         </div>
       </div>
@@ -400,7 +400,7 @@
           </footer>
         </article>
         <article class="review reveal">
-          <p class="rev-stars mono" aria-label="Rated 4.8 out of 5">★★★★★ <span>4.8</span></p>
+          <p class="rev-stars mono" aria-label="Rated 4.8 out of 5">★★★★☆ <span>4.8</span></p>
           <blockquote class="rev-quote"><p>One charge a week, zero chain grease on my trousers all winter.
             The belt drive is the whole argument. Docked 0.2 because I wanted a second bottle mount.</p></blockquote>
           <footer class="rev-foot">

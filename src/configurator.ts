@@ -39,12 +39,25 @@ export function initConfigurator(reducedMotion: boolean): void {
   let priceRaf = 0;
   let priceTimer = 0;
 
+  /* The count-up mutates text every frame for ~450 ms — far too chatty for a
+     live region. Split the price into a visual-only animated span (aria-hidden)
+     and a visually-hidden span that AT reads, updated once per change. */
+  const priceVisual = document.createElement('span');
+  priceVisual.setAttribute('aria-hidden', 'true');
+  priceVisual.textContent = sumPrice.textContent;
+  const priceSpoken = document.createElement('span');
+  priceSpoken.className = 'sr-only';
+  priceSpoken.textContent = sumPrice.textContent;
+  sumPrice.textContent = '';
+  sumPrice.append(priceVisual, priceSpoken);
+
   const animatePrice = (to: number) => {
     cancelAnimationFrame(priceRaf);
     clearTimeout(priceTimer);
+    if (priceSpoken.textContent !== euro(to)) priceSpoken.textContent = euro(to);
     if (reducedMotion || to === shownPrice) {
       shownPrice = to;
-      sumPrice.textContent = euro(to);
+      priceVisual.textContent = euro(to);
       return;
     }
     const from = shownPrice;
@@ -54,14 +67,14 @@ export function initConfigurator(reducedMotion: boolean): void {
       const p = Math.min(1, (t - start) / dur);
       const eased = 1 - Math.pow(1 - p, 3);
       shownPrice = Math.round(from + (to - from) * eased);
-      sumPrice.textContent = euro(shownPrice);
+      priceVisual.textContent = euro(shownPrice);
       if (p < 1) priceRaf = requestAnimationFrame(tick);
     };
     priceRaf = requestAnimationFrame(tick);
     // insurance: land on the final price even if rAF gets throttled
     priceTimer = window.setTimeout(() => {
       shownPrice = to;
-      sumPrice.textContent = euro(to);
+      priceVisual.textContent = euro(to);
     }, dur + 150);
   };
 

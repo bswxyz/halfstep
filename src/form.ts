@@ -23,5 +23,11 @@ export function initReserveForm(): void {
     form.innerHTML =
       `<div class="res-done"><strong>Slot held — batch 07.</strong>` +
       `<span class="mono">size ${chosen} · demo only, nothing was sent. a real shop would email you within the hour.</span></div>`;
+    // move focus to the confirmation — keyboard/AT users just lost the submit button
+    const done = form.querySelector<HTMLElement>('.res-done');
+    if (done) {
+      done.setAttribute('tabindex', '-1');
+      done.focus();
+    }
   });
 }
